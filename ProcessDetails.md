@@ -14,6 +14,20 @@ The data includes 24 hours of individual speed data at three different locations
 -   *After* condition road width 20 ft, edge lines 2 ft from edge of pavement, no center line
 -   AADT (Average Annual Daily Traffic) of 2000 vehicles per day
 
+### Importing data
+
+The data I have are in csv forms. There are 3 locations and each have 2 directions of travel, and each of those are collected on 3 different times (before condition, after condition right after lane road narrowing, and another one 4 months after the treatment). That is 18 files and I don't like to clutter my code importing files one by one and then work on each one individually. So, I tried to find a way to automate this importing into 18 different dataframes in one run. Each of the dataframes can take the name of the file and the values inside will be imported from the csv file.
+
+-   I used `list.files()` to collect the name of the data files into a temporary dataframe
+-   used `sub()` to remove the .csv from the file names and create individual dataframe names
+-   used `strsplit()` to extract location and direction from the names
+-   used `read.csv()` to read from the csv files
+-   used `assign()` to stored the data into individual dataframes
+-   add new columns for each dataframe containing the location and direction
+-   to automate this process, all were done in a *For loop*
+-   used `rbind()` to bind all dataframes into a single dataframe
+-   removed all the interim variables and dataframes
+
 ## Analysis Process
 
 The analysis of this data will include the following steps:
