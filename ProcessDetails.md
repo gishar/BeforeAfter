@@ -1,7 +1,5 @@
 # A lane narrowing Before/After analysis of speed data
 
-For detailed step by step analysis, open the [process details]() file.
-
 ## Objective
 
 The objective of this project is to see if narrowing the lanes has any effects on driver speed.
