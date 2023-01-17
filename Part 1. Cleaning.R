@@ -1,6 +1,7 @@
 # Loading required libraries
+library(lubridate)
+library(tidyverse)
 # library(data.table)
-# library(tidyverse)
 # detach("package:tidyverse", unload = TRUE)
 
 # Importing data
@@ -15,12 +16,35 @@ for (index in 1:length(myfiles)) {
      # assign(letters[index], variable_data)
      Speed = rbind(Speed, variable_data)
 }
-
 rm(index, myfiles, variable_name, variable_data)
+
+# Lubridating
+Speed$DateTime <- as.POSIXct(Speed$DateTime, format = "%m/%d/%Y %H:%M")
+Speed <- Speed %>% 
+     mutate(Year = factor(year(DateTime))) %>% 
+     mutate(Month = factor(month(ymd_hms(DateTime), label = TRUE))) %>% 
+     mutate(Day = factor(day(DateTime))) %>% 
+     mutate(Hour = factor(hour(DateTime), ordered = T)) %>%       # to make ordinal factor
+     mutate(Minute = factor(minute(DateTime), ordered = T)) %>% 
+     mutate(LD = factor(LD)) %>% 
+     mutate(Location = factor(Location)) %>% 
+     mutate(Direction = factor(Direction)) %>%
+     mutate(AdviceCode = factor(AdviceCode)) %>% 
+     glimpse()
+
+Speed <- Speed[c(1, 8:12, 7, 5:6, 2:4)]
+
+
 ###############################
-
-
-
+plot.new()
+str(Speed)
+table(Speed$AdviceCode)
+boxplot(Speed$Speed ~ Speed$AdviceCode)
+hist(Speed$Speed)
+Speed %>% 
+     filter(AdviceCode == 128, Speed > 50) %>% 
+     summarise(Count = n())
+     
 
 
 

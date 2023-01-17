@@ -22,11 +22,22 @@ The data I have are in csv forms. There are 3 locations and each have 2 directio
 -   used `sub()` to remove the .csv from the file names and create individual dataframe names
 -   used `strsplit()` to extract location and direction from the names
 -   used `read.csv()` to read from the csv files
--   used `assign()` to stored the data into individual dataframes
+-   used `assign()` to stored the data into individual dataframes - p.s. modified to not need this.
 -   add new columns for each dataframe containing the location and direction
 -   to automate this process, all were done in a *For loop*
--   used `rbind()` to bind all dataframes into a single dataframe
+-   used `rbind()` to bind all dataframes into a single dataframe as csv files were being read
 -   removed all the interim variables and dataframes
+
+Come to think of it, the easiest way for importing the data would have been to have 18 lines of read.csv() to read the files and then 5 lines for each to form the dataframes at each location. in total it would have been more than 100 lines of code to do what I did in 7 lines within a for loop. I am happy now!
+
+### Feature Engineering
+
+The date and time is imported into the dataframe as character data and for this I will use the `lubridate` library to do some *feature engineering*. For this step, I extracted Year, month, day of month, hour, and minute in separate columns. Although, for this type of work, most likely just the month and hours will be used in the analysis and comparisons. We'll see.
+
+In addition, class of the variables Location, Direction, and AdviceCode were assigned as factor
+
+### Cleaning up the date from outliers
+
 
 ## Analysis Process
 
