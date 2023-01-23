@@ -34,18 +34,28 @@ Come to think of it, the easiest way for importing the data would have been to h
 
 The date and time is imported into the dataframe as character data and for this I will use the `lubridate` library to do some *feature engineering*. For this step, I extracted Year, month, day of month, hour, and minute in separate columns. Although, for this type of work, most likely just the month and hours will be used in the analysis and comparisons. We'll see.
 
-In addition, class of the variables Location, Direction, and AdviceCode were assigned as factor
+In addition, class of the variables Location, Direction, and Advice Code were assigned as factor
 
 ### Cleaning up the date from outliers
 
+The data is collected from a roadway with a speed limit of 25 mph inside a neighborhood. A quick boxplot of the speed data shows that the data includes many outliers that need to be shaved off the data. It can be observed that some of the speed data is shown as above 150 mph which is absurd. Another quick glance at boxplots of speed data for each levels of the mysterious factor variable AdviceCode shows that many of these outliers are tied to the level 128 of this variable.
+
+-   Used the `table()` to see how many records are under this level - turns our 304 out of total of 9243
+-   used `summary()` to see the distribution of speed data under this level - turns out Q1 is already higher than speed limit, and median is 127 mph
+
+This tells me something strange is happening with this level of AdviceCode and I need to remove it from the data completely. Next, with my knowledge on the speed data, if not rare, it would be suicidal for anyone driving with a speed of higher than 70 mph. I will remove any speed higher than 70 mph. At the same time I will also remove any speed lower than 15 mph, as that would not be a likely case to be witnessed on such a road. First I extracted all the above records and there is no apparent pattern with time of day for these records. I noticed there is no pattern between these outlier speeds and time of day either. There are a total of 548 out of 9243 records that will be thrown away.
 
 ## Analysis Process
 
-The analysis of this data will include the following steps:
+The analysis of this data will include the following steps: Data Aggregation, EDA, and Statistical Analysis.
 
-1.  Cleaning
-2.  Aggregation
-3.  EDA - Visual before/after comparisons
-4.  Statistical before/after comparisons
+@@@@ Now it's time to aggregate
+@@@@ need to add time as a variable too. just time with hour and minute only so I can graph by time.
+
+### 1. Aggregation
+
+### 2. EDA - Visual before/after comparisons
+
+### 3. Statistical before/after comparisons
 
 ## Conclusions
