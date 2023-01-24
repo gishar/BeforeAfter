@@ -1,8 +1,6 @@
 # Loading required libraries
 library(lubridate)
 library(tidyverse)
-# library(data.table)
-# detach("package:tidyverse", unload = TRUE)
 
 # Importing data
 myfiles = list.files(path = "Data")
@@ -24,6 +22,7 @@ SpeedData <- SpeedData %>%
      mutate(Year = factor(year(DateTime))) %>% 
      mutate(Month = factor(month(ymd_hms(DateTime), label = TRUE))) %>% 
      mutate(Day = factor(day(DateTime))) %>% 
+     mutate(Time = format(DateTime, format="%H:%M:%S")) %>% 
      mutate(Hour = factor(hour(DateTime), ordered = T)) %>%       # to make ordinal factor
      mutate(Minute = factor(minute(DateTime), ordered = T)) %>% 
      mutate(LD = factor(LD)) %>% 
@@ -32,7 +31,7 @@ SpeedData <- SpeedData %>%
      mutate(AdviceCode = factor(AdviceCode)) %>% 
      glimpse()
 
-SpeedData <- SpeedData[c(1, 8:12, 7, 5:6, 2:4)]
+SpeedData <- SpeedData[c(1, 8:13, 7, 5:6, 2:4)]
 
 # Cleaning outliers
 plot.new()
@@ -49,28 +48,20 @@ SpeedData %>%
 # Extract records when AdviceCode is 128 or speed is lower than 15 or higher than 70 mph - cleaning the data
 Outliers <- SpeedData %>% 
      filter(AdviceCode == 128 | Speed < 15 | Speed > 70) 
+
 plot(Outliers$Hour, Outliers$Speed)
+
 plot(table(Outliers$Speed), 
      xlab = "Outlier speed",
      ylab = "Number of records")
-sprintf("%d outlier records will be removed from the original dataset", nrow(Outliers))
 
 SpeedData <- SpeedData %>% 
      filter(AdviceCode != 128, Speed >= 15, Speed <= 70)
-nrow(SpeedData)
 
+sprintf("%d outlier records will be removed from the original dataset", nrow(Outliers))
+sprintf("Cleaned speed data will include %d records, which is %.2f%s of the total original number of records", 
+        nrow(SpeedData), 
+        100 * nrow(SpeedData)/(nrow(SpeedData)+nrow(Outliers)),
+        '%')
 
-###############################
-
-table(SpeedData$AdviceCode)
-boxplot(SpeedData$Speed ~ Speed$AdviceCode)
-hist(SpeedData$Speed)
-SpeedData %>% 
-     filter(AdviceCode == 128, Speed > 50) %>% 
-     summarise(Count = n())
-     
-
-
-
-##@@@@@@@@@@@@@@@
-rm(list = ls())
+# This wraps up part 1
