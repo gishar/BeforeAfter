@@ -359,7 +359,7 @@ display: none;
 
 
 <h1 style="text-align: center;">
-<p>A Before/After analysis of speed data</p>
+<p>A Before/After Analysis of Speed Data</p>
 </h1>
 <div id="objective" class="section level2">
 <h2>Objective:</h2>
@@ -452,7 +452,10 @@ lower than 15 mph, as that would not be a likely case to be witnessed on
 such a road. First I extracted all the above records and there is no
 apparent pattern with time of day for these records. I noticed there is
 no pattern between these outlier speeds and time of day either. There
-are a total of 548 out of 9243 records that will be thrown away.</p>
+are a total of 548 out of 9243 records that will be thrown away. Speed
+Data is redefined to exclude the outliers and the cryptic name of the
+locations were also changed to make them easier to follow by locations 1
+to 3.</p>
 <p>This will wrap up Part 1 of this project.</p>
 </div>
 </div>
@@ -462,7 +465,27 @@ are a total of 548 out of 9243 records that will be thrown away.</p>
 Aggregation, EDA, and Statistical Analysis. First, I called the script
 for Part 1 to start with the cleaned and engineered dataframe created in
 the first steps. I also attached the Speed dataframe to make it easier
-to work with the variables for EDA, possibly.</p>
+to work with the variables for EDA, possibly. Let’s make some initial
+observation on the distribution of data and see how speed data compares
+between locations, or maybe between two directions at the same location.
+For the time being, I am not going to worry about the column “Length” in
+the dataset which is supposedly about the length of each vehicle in each
+record. Let’s do the followings:</p>
+<ul>
+<li>Overall histogram of speeds</li>
+<li>Histogram of speeds for each location and direction</li>
+</ul>
+<p>Based on the histograms, it seems that:</p>
+<ul>
+<li><em>Considering all locations along the test road, the 85th
+percentile speed is approximately 10 mph higher than the speed limit and
+about 5 mph higher than average</em></li>
+<li><em>Location 1, especially in the EB direction out of the three
+locations/directions has higher compliance with the speed limit since
+the distribution is centered closer to the speed limit compared to the
+rest.</em></li>
+<li></li>
+</ul>
 <div id="aggregation" class="section level3">
 <h3>2.1. Aggregation</h3>
 </div>
@@ -474,7 +497,7 @@ to work with the variables for EDA, possibly.</p>
 </div>
 </div>
 <div id="conclusions" class="section level2">
-<h2>Conclusions</h2>
+<h2>3. Conclusions</h2>
 </div>
 
 
