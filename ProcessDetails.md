@@ -49,13 +49,21 @@ The data is collected from a roadway with a speed limit of 25 mph inside a neigh
 -   Used the `table()` to see how many records are under this level - turns our 304 out of total of 9243
 -   used `summary()` to see the distribution of speed data under this level - turns out Q1 is already higher than speed limit, and median is 127 mph
 
-This tells me something strange is happening with this level of AdviceCode and I need to remove it from the data completely. Next, with my knowledge on the speed data, if not rare, it would be suicidal for anyone driving with a speed of higher than 70 mph. I will remove any speed higher than 70 mph. At the same time I will also remove any speed lower than 15 mph, as that would not be a likely case to be witnessed on such a road. First I extracted all the above records and there is no apparent pattern with time of day for these records. I noticed there is no pattern between these outlier speeds and time of day either. There are a total of 548 out of 9243 records that will be thrown away.
+This tells me something strange is happening with this level of AdviceCode and I need to remove it from the data completely. Next, with my knowledge on the speed data, if not rare, it would be suicidal for anyone driving with a speed of higher than 70 mph. I will remove any speed higher than 70 mph. At the same time I will also remove any speed lower than 15 mph, as that would not be a likely case to be witnessed on such a road. First I extracted all the above records and there is no apparent pattern with time of day for these records. I noticed there is no pattern between these outlier speeds and time of day either. There are a total of 548 out of 9243 records that will be thrown away. Speed Data is redefined to exclude the outliers and the cryptic name of the locations were also changed to make them easier to follow by locations 1 to 3.
 
 This will wrap up Part 1 of this project.
 
 ## 2. Analysis Process
 
-The analysis of this data will include the following steps: Data Aggregation, EDA, and Statistical Analysis. First, I called the script for Part 1 to start with the cleaned and engineered dataframe created in the first steps. I also attached the Speed dataframe to make it easier to work with the variables for EDA, possibly.
+The analysis of this data will include the following steps: Data Aggregation, EDA, and Statistical Analysis. First, I called the script for Part 1 to start with the cleaned and engineered dataframe created in the first steps. I also attached the Speed dataframe to make it easier to work with the variables for EDA, possibly. Let's make some initial observation on the distribution of data and see how speed data compares between locations, or maybe between two directions at the same location. For the time being, I am not going to worry about the column "Length" in the dataset which is supposedly about the length of each vehicle in each record. Let's do the followings:
+
+-   Overall histogram of speeds
+-   Histogram of speeds for each location and direction
+
+Based on the histograms, it seems that:
+
+-   *Location 1, especially in the EB direction out of the three locations/directions has higher compliance with the speed limit since the distribution is centered closer to the speed limit compared to the rest.*
+-   
 
 ### 2.1. Aggregation
 

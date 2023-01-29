@@ -56,7 +56,22 @@ plot(table(Outliers$Speed),
      ylab = "Number of records")
 
 SpeedData <- SpeedData %>% 
-     filter(AdviceCode != 128, Speed >= 15, Speed <= 70)
+     mutate(Location = dplyr::recode(Location, 
+                              EOC = "Location 1",
+                              EOR = "Location 2",
+                              NOC = "Location 3"
+                              )) %>% 
+     mutate(LD = dplyr::recode(LD, 
+                               EOCEB = "Location 1 - EB",
+                               EOCWB = "Location 1 - WB",
+                               EOREB = "Location 2 - EB",
+                               EORWB = "Location 2 - WB",
+                               NOCNB = "Location 3 - NB",
+                               NOCSB = "Location 3 - SB"
+     )) %>% 
+     filter(AdviceCode != 128, 
+            Speed >= 15, 
+            Speed <= 70)
 
 sprintf("%d outlier records will be removed from the original dataset", nrow(Outliers))
 sprintf("Cleaned speed data will include %d records, which is %.2f%s of the total original number of records", 
