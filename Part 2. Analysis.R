@@ -5,15 +5,16 @@ attach(SpeedData)
 
 options(digits = 1)
 
-#### Number of records (volume) for each Location by Direction ####
+#### EDA: Number of records (volume) for each Location by Direction and Month ####
 SpeedData %>% 
-     ggplot(aes(x = Location,
+     ggplot(aes(x = LD,
                 fill = Direction)) + 
      geom_bar(color = "black") +
+     facet_wrap(~ Month, nrow = 3) +
      labs(title="Number of vehicles (records) per location by direction")
 
 
-#### Overall histogram of Speed ####
+#### EDA: Overall histogram of Speed ####
 SpeedData %>% 
      ggplot(aes(x = Speed)) +
      geom_histogram(binwidth = 1,
@@ -35,7 +36,7 @@ SpeedData %>%
                           "\n85th Percentile speed = ", round(quantile(Speed, 0.85), 1), "mph"),
               color="blue4")
 
-#### Overall histogram of Speed by Month ####
+#### EDA: Overall histogram of Speed by Month ####
 SpeedData %>% 
      ggplot(aes(x = Speed)) +
      geom_histogram(binwidth = 1,
@@ -53,7 +54,7 @@ SpeedData %>%
                 nrow = length(Month))
 
 
-#### Histogram of Speed for each location ####
+#### EDA: Histogram of Speed for each location ####
 SpeedData %>% 
      ggplot(aes(x = Speed)) +
      geom_histogram(aes(fill = Direction), 
@@ -73,21 +74,90 @@ SpeedData %>%
 
 #### Aggregation of volume and speed by 1-hour bins ####
 Hourly <- SpeedData %>% 
-     group_by(Location, Direction, Month, Hour) %>% 
+     group_by(LD, Location, Direction, Month, Hour) %>% 
      arrange(Month, Hour) %>% 
      summarise(Volume = n(),
                Speed.Mean = mean(Speed),
                Speed.Median = median(Speed),
                Speed.85thP = quantile(Speed, 0.85))
 
+#### EDA: Hourly volume for the Month of April ####
 Hourly %>% 
+     filter(Month == "Apr") %>% 
      ggplot(aes(x = Hour,
                 y = Volume,
-                fill = Month)) + 
+                fill = Location)) + 
      geom_bar(stat = "identity", 
-              color = "black") + 
+              color = "black",
+              show.legend = F) + 
      facet_wrap(~ Location + Direction, 
-                nrow = 3)
+                nrow = 3) +
+     labs(title = "Hourly Volume for the Month of April")
+
+#### EDA: Hourly 85th percentile speed for location 1 across 3 data collections ####
+Hourly %>% 
+     filter(Location == "Location 3") %>% 
+     ggplot(aes(x = Hour,
+                y = Speed.85thP,
+                fill = Month)) + 
+     geom_point(shape = "-",
+                size = 5,
+              color = "blue4",
+              show.legend = F) + 
+     scale_fill_manual(values = brewer.pal(3, "Set2")) +
+     facet_wrap(~ Direction + Month, 
+                nrow = 2) +
+     geom_hline(yintercept = 25,
+                color = "black",
+                linetype = "dashed") +
+     labs(title = "Hourly 85th Percentile Speed for Location 1",
+          subtitle = "Speed Limit = 25 mph",
+          y = "85th Percentile Speed")
+
+
+#### EDA: Daily overall 85th percentile speed for location 2 across 3 data collections ####
+SpeedData %>% 
+     group_by(LD, Location, Direction, Month) %>% 
+     arrange(Month) %>% 
+     summarise(Speed.85thP = quantile(Speed, 0.85)) %>% 
+     ggplot(aes(x = Month,
+                y = Speed.85thP,
+                fill = Location),
+            fill = Month) +
+     geom_bar(stat = "identity",
+              color = "black",
+              show.legend = F) +
+     geom_hline(yintercept = 25, 
+                color = "black",
+                linetype = "dashed",
+                alpha = 0.2) +
+     geom_text(aes(label=Speed.85thP), 
+               vjust=2) +
+     facet_wrap(~ LD,
+                nrow = 3) +
+     labs(title = "Overall daily 85th Percentile Speed",
+          subtitle = "Speed Limit = 25 mph",
+          y = "85th Percentile Speed (mph)")
+
+#### EDA: Heat map of 85th percentile speed for the month of April ####
+Hourly %>%
+     filter(Month == "Apr") %>% 
+     ggplot(aes(Hour, 
+                LD, 
+                fill = Speed.85thP)) +
+     geom_tile(color = "black") +
+     scale_fill_gradient(low = "white", high = "darkred") + 
+     geom_text(aes(label = Volume), 
+               size = 3, 
+               angle = 90,
+               alpha = 0.4) +
+     labs(title = "Heat map of 85th percentile speed for the month of April",
+          subtitle = "Numbers show traffic volume of the hours",
+          y = "",
+          fill = "85th% speed")
+
+#### Stat Test: ####
+
 
 
 glimpse(Hourly)

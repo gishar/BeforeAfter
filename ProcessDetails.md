@@ -57,22 +57,38 @@ This will wrap up Part 1 of this project.
 
 The analysis of this data will include the following steps: Data Aggregation, EDA, and Statistical Analysis. First, I called the script for Part 1 to start with the cleaned and engineered dataframe created in the first steps. I also attached the Speed dataframe to make it easier to work with the variables for EDA, possibly. Let's make some initial observation on the distribution of data and see how speed data compares between locations, or maybe between two directions at the same location. For the time being, I am not going to worry about the column "Length" in the dataset which is supposedly about the length of each vehicle in each record. Let's do the followings:
 
--   Bar chart of number of records for each location by direction
+-   Bar chart of volume for each location by direction in each data collection
 -   Overall histogram of speeds and by Month
 -   Histogram of speeds for each location and direction
 
 Based on the histograms, it seems that:
 
 -   *Considering all locations along the test road, the 85th percentile speed is approximately 10 mph higher than the speed limit and about 5 mph higher than average*
--   *Location 1, especially in the EB direction out of the three locations/directions has higher compliance with the speed limit since the distribution is centered closer to the speed limit compared to the rest.*
+-   *Location 1 has a higher volume as compared to the other locations, also it shows a higher compliance with the speed limit especially in the EB direction out of the three locations/directions, since the distribution is centered closer to the speed limit compared to the rest.*
 -   *No specific pattern can be observed between the months of data collection*
 
 ### 2.1. Aggregation
 
-Generally, traffic volumes and speeds are grouped into bins of 15 minutes and 1-hour periods. due to the low volume of traffic in residential streets, there is no point in aggregating over 15-min intervals and so, I am going to make a new dataset to present aggregated statistics for hourly intervals which will be used for EDA and statistical analysis purposes later on. Several functions from the `dplyr` library are handy for this purpose such as `group by`, `summarise` and `arrange`. 
+Generally, traffic volumes and speeds are grouped into bins of 15 minutes and 1-hour periods. due to the low volume of traffic in residential streets, there is no point in aggregating over 15-min intervals and so, I am going to make a new dataset to present aggregated statistics for hourly intervals which will be used for EDA and statistical analysis purposes later on. Several functions from the `dplyr` library are handy for this purpose such as `group by`, `summarise` and `arrange`.
 
 ### 2.2. EDA - Visual before/after comparisons
 
+At this I am interested to see how the hourly volumes and maybe 85th percentile speeds are distributed for each location/direction during each of the data collection efforts for the before and after conditions. The EDA shows the followings:
+
+-   Hourly volumes in none of the cases exceed 60 vehicles per hour, which is quite low
+-   Volumes peak around 7 AM for the morning rush hour and no specific pattern for the PM rush hour
+-   Comparing the 85th percentile speed for a location 1 over the three data collection periods
+    -   for the EB direction, it seems the 85th percentile increases after the lanes are narrowed
+    -   for the WB direction, it seems the 85th percentile does change much after the lanes are narrowed
+
+No specific patterns for the 85th percentile speed can be observed over the different data collection periods which makes the results inconclusive as if the lane narrowing is really effective in reducing the speeds of the vehicles. The same is true for the mean and median speeds as well.
+
 ### 2.3. Statistical before/after comparisons
+
+Now that I did some EDA to have an idea of how the treatment has affected the speeds of vehicles, I will conduct some statistical tests to see if the differences observed are statistically significant as well. In my personal opinion, when I saw no specific pattern in the changes of the speed statistics before and after the lane narrowing was implemented, I don't see much need for giving a statistical taste to it as well but since this is a procedure and part of the steps I will do it anyway. I will conduct the followings:
+
+-   Is there a statistical difference between the average and 85th percentile speed of the vehicles for the three periods (main study question)
+-   Is there a statistical difference between the average and 85th percentile speed between the three locations (just curious)
+-   Is there a statistical difference between the average and 85th percentile speed between the two directions at a given location (just curious)
 
 ## 3. Conclusions
