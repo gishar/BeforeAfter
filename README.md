@@ -1,6 +1,6 @@
 # A lane narrowing Before/After analysis of speed data
 
-For detailed step by step analysis, open the [process details](https://github.com/gishar/BeforeAfter/blob/main/ProcessDetails.Rmd) file. 
+For detailed step by step analysis, open the [process details](https://github.com/gishar/BeforeAfter/blob/main/ProcessDetails.pdf) file, or the corresponding [.rmd](https://github.com/gishar/BeforeAfter/blob/main/ProcessDetails.Rmd) file for details.
 For the codes, open the Part 1 and Part 2 R scripts.
 
 ## Objective
@@ -27,3 +27,4 @@ The analysis of this data will include the following steps:
 4.  Statistical before/after comparisons
 
 ## Conclusions
+In short, the results observed were a mix of various observations, and although the ANOVA tests performed to see if the differences were statistically significant for some, but the higher speed in the after period shows that the objective of installing narrower lanes in the hope of reducing people's speed is not working on this experiment.
