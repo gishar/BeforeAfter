@@ -3,8 +3,8 @@ title: "A Before/After Analysis of Speed Data"
 author: "Gishar!"
 date: "1/11/2023"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 always_allow_html: Yes
 ---
 
