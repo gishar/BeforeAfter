@@ -1,0 +1,188 @@
+---
+title: "A Before/After Analysis of Speed Data"
+author: "Gishar!"
+date: "1/11/2023"
+output: html_document
+---
+
+```{r, echo = F, message = F, results = 'hide', include = FALSE}
+lapply(c("DT", "tidyverse", "RColorBrewer", "gridExtra"), require, character.only = T)
+source("Part 1. Cleaning.R")
+source("Part 2. Analysis.R")
+attach(SpeedData)
+```
+
+## Objective:
+
+The objective of this project is to see if ***narrowing the lanes*** has any effects on driver speed.
+
+------------------------------------------------------------------------
+
+## 1. Data
+
+The data includes 24 hours of individual speed data at three different locations in both directions of travel for: - before condition - after condition (1 month after) - after condition (4 months after). Here are some details on the locations:
+
+-   Residential street
+-   Speed limit 25 mph
+-   *Before* condition road width 24 ft, between edges of pavement (not curb to curb), no edge lines
+-   *After* condition road width 20 ft, edge lines 2 ft from edge of pavement, no center line
+-   AADT (Average Annual Daily Traffic) of 2000 vehicles per day
+
+### 1.1. Importing data
+
+The data I have are in csv forms. There are 3 locations and each have 2 directions of travel, and each of those are collected on 3 different times (before condition, after condition right after lane road narrowing, and another one 4 months after the treatment). That is 18 files and I don't like to clutter my code importing files one by one and then work on each one individually. So, I tried to find a way to automate this importing into 18 different dataframes in one run. Each of the dataframes can take the name of the file and the values inside will be imported from the csv file.
+
+-   I used `list.files()` to collect the name of the data files into a temporary dataframe
+-   used `sub()` to remove the .csv from the file names and create individual dataframe names
+-   used `strsplit()` to extract location and direction from the names
+-   used `read.csv()` to read from the csv files
+-   used `assign()` to stored the data into individual dataframes - p.s. modified to not need this.
+-   add new columns for each dataframe containing the location and direction
+-   to automate this process, all were done in a *For loop*
+-   used `rbind()` to bind all dataframes into a single dataframe as csv files were being read
+-   removed all the interim variables and dataframes
+
+Come to think of it, the easiest way for importing the data would have been to have 18 lines of read.csv() to read the files and then 5 lines for each to form the dataframes at each location. in total it would have been more than 100 lines of code to do what I did in 7 lines within a for loop. I am happy now!
+
+### 1.2. Feature Engineering
+
+The date and time is imported into the dataframe as character data and for this I will use the `lubridate` library to do some *feature engineering*. For this step, I extracted Year, month, day of month, Time, hour, and minute in separate columns. Although, for this type of work, most likely just the month and hours will be used in the analysis and comparisons. We'll see.
+
+In addition, class of the variables Location, Direction, and Advice Code were assigned as factor
+
+### 1.3. Cleaning up the date from outliers
+
+The data is collected from a roadway with a speed limit of 25 mph inside a neighborhood. A quick boxplot of the speed data shows that the data includes many outliers that need to be shaved off the data. It can be observed that some of the speed data is shown as above 150 mph which is absurd. Another quick glance at boxplots of speed data for each levels of the mysterious factor variable AdviceCode shows that many of these outliers are tied to the level 128 of this variable.
+
+-   Used the `table()` to see how many records are under this level - turns our 304 out of total of 9243
+-   used `summary()` to see the distribution of speed data under this level - turns out Q1 is already higher than speed limit, and median is 127 mph
+
+This tells me something strange is happening with this level of AdviceCode and I need to remove it from the data completely. Next, with my knowledge on the speed data, if not rare, it would be suicidal for anyone driving with a speed of higher than 70 mph. I will remove any speed higher than 70 mph. At the same time I will also remove any speed lower than 15 mph, as that would not be a likely case to be witnessed on such a road. First I extracted all the above records and there is no apparent pattern with time of day for these records. I noticed there is no pattern between these outlier speeds and time of day either. There are a total of 548 out of 9243 records that will be thrown away. Speed Data is redefined to exclude the outliers and the cryptic name of the locations were also changed to make them easier to follow by locations 1 to 3.
+
+This will wrap up Part 1 of this project.
+
+## 2. Analysis Process
+
+The analysis of this data will include the following steps: Data Aggregation, EDA, and Statistical Analysis. First, I called the script for Part 1 to start with the cleaned and engineered dataframe created in the first steps. I also attached the Speed dataframe to make it easier to work with the variables for EDA, possibly. Let's make some initial observation on the distribution of data and see how speed data compares between locations, or maybe between two directions at the same location. For the time being, I am not going to worry about the column "Length" in the dataset which is supposedly about the length of each vehicle in each record. Let's do the following overall EDAs:
+
+-   Bar chart of volume for each location by direction in each data collection
+-   Overall histogram of speeds and by Month
+-   Histogram of speeds for each location and direction
+
+```{r, echo = F, message = F, eresults = 'hide'}
+SpeedData %>% 
+     ggplot(aes(x = Speed)) +
+     geom_histogram(aes(fill = Direction), 
+                    binwidth = 1,
+                    col = 'black',
+                    show.legend = F,
+                    alpha = 0.6) +
+     geom_vline(xintercept = 25, 
+                color = "red",
+                linetype = "dashed") +
+     facet_wrap(~ LD, 
+                nrow = length(levels(LD))) +
+     labs(title = "Histogram of Speeds",
+          subtitle = "Speed limit = 25 mph (dashed red line)",
+          x = "Speed",
+          y = "Frequency")
+```
+
+Based on the histograms, it seems that:
+
+-   *Considering all locations along the test road, the 85th percentile speed is approximately 10 mph higher than the speed limit and about 5 mph higher than average*
+-   *Location 1 has a higher volume as compared to the other locations, also it shows a higher compliance with the speed limit especially in the EB direction out of the three locations/directions, since the distribution is centered closer to the speed limit compared to the rest.*
+-   *No specific pattern can be observed between the months of data collection*
+
+### 2.1. Aggregation
+
+Generally, traffic volumes and speeds are grouped into bins of 15 minutes and 1-hour periods. due to the low volume of traffic in residential streets, there is no point in aggregating over 15-min intervals and so, I am going to make a new dataset to present aggregated statistics for hourly intervals which will be used for EDA and statistical analysis purposes later on. Several functions from the `dplyr` library are handy for this purpose such as `group by`, `summarise` and `arrange`.
+
+```{r, echo = F, message = F, eresults = 'hide'}
+Hourly %>% 
+     ungroup() %>% 
+     select(Location, Direction, Month, Hour, Volume, 'Mean Speed' = Speed.Mean, 'Median Speed' = Speed.Median, '85th Percentile Speed' = Speed.85thP) %>% 
+     datatable(options = list(pageLength = 5, 
+                              autoWidth = TRUE))
+```
+
+### 2.2. Visual before/after comparisons
+
+At this I am interested to see how the hourly volumes and maybe 85th percentile speeds are distributed for each location/direction during each of the data collection efforts for the before and after conditions. The EDA shows the followings:
+
+-   Hourly volumes in none of the cases exceed 60 vehicles per hour, which is quite low
+-   Volumes peak around 7 AM for the morning rush hour and no specific pattern for the PM rush hour
+-   Comparing the 85th percentile speed for a location 1 over the three data collection periods
+    -   for the EB direction, it seems the 85th percentile increases after the lanes are narrowed
+    -   for the WB direction, it seems the 85th percentile does change much after the lanes are narrowed
+
+```{r, echo = F, message = F, eresults = 'hide'}
+Hourly %>% 
+     filter(Month == "Apr") %>% 
+     ggplot(aes(x = Hour,
+                y = Volume,
+                fill = Location)) + 
+     geom_bar(stat = "identity", 
+              color = "black",
+              show.legend = F) + 
+     facet_wrap(~ Location + Direction, 
+                nrow = 3) +
+     labs(title = "Hourly Volume for the Month of April")
+```
+
+```{r, echo = F, message = F, eresults = 'hide'}
+SpeedData %>% 
+     group_by(LD, Location, Direction, Month) %>% 
+     arrange(Month) %>% 
+     summarise(Speed.85thP = quantile(Speed, 0.85)) %>% 
+     ggplot(aes(x = Month,
+                y = Speed.85thP,
+                fill = Location),
+            fill = Month) +
+     geom_bar(stat = "identity",
+              color = "black",
+              show.legend = F) +
+     geom_hline(yintercept = 25, 
+                color = "black",
+                linetype = "dashed",
+                alpha = 0.2) +
+     geom_text(aes(label=Speed.85thP), 
+               vjust=2) +
+     facet_wrap(~ LD,
+                nrow = 3) +
+     labs(title = "Overall daily 85th Percentile Speed",
+          subtitle = "Speed Limit = 25 mph",
+          y = "85th Percentile Speed (mph)")
+```
+
+No specific patterns for the 85th percentile speed can be observed over the different data collection periods which makes the results inconclusive as if the lane narrowing is really effective in reducing the speeds of the vehicles. The same is true for the mean and median speeds as well.
+
+### 2.3. Statistical before/after comparisons
+
+Now that I did some EDA to have an idea of how the treatment has affected the speeds of vehicles, I will conduct some statistical tests to see if the differences observed are statistically significant as well. In my personal opinion, when I saw no specific pattern in the changes of the speed statistics before and after the lane narrowing was implemented, I don't see much need for giving a statistical taste to it as well but since this is a procedure and part of the steps I will do it anyway. I will conduct an ANOVA to see if there is a statistical difference between the average and 85th percentile speed of the vehicles for the three periods at any of the locations (main study question)
+
+```{r, echo = F, message = F, eresults = 'hide'}
+options(digits = 7, scipen = 99)
+ANOVA.Results
+```
+
+```{r, echo = F, message = F, eresults = 'hide'}
+grid.arrange(plot.box, plot.density, ncol = 2)
+Hourly %>% 
+     filter(LD == "Location 1 - WB") %>% 
+     select(Month, Volume, Speed.85thP) %>% 
+     aov(Speed.85thP ~ Month, data = .) %>% 
+     TukeyHSD()
+```
+
+## 3. Conclusions
+
+A quick conclusion of this analysis is that the lane narrowing treatment, did not have a conclusive outcome. I looked at 6 different data sets, each over a three data collection period. Before the treatment, a week after and a couple month after the treatment. The results observed were a mix of various observations, with higher or lower speeds observed between locations and dates.
+
+In addition, although the ANOVA tests performed to see if the differences were statistically significant for some, but the higher speed in the after period shows that the objective of installing narrower lanes in the hope of reducing people's speed is not working.
+
+This should end this project. Ciao
+
+```{r, echo = F, message = F, eresults = 'hide'}
+sessioninfo::session_info()
+```
