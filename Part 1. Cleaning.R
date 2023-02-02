@@ -16,6 +16,7 @@ for (index in 1:length(myfiles)) {
 }
 rm(index, myfiles, variable_name, variable_data)
 
+
 # Lubridating
 SpeedData$DateTime <- as.POSIXct(SpeedData$DateTime, format = "%m/%d/%Y %H:%M")
 SpeedData <- SpeedData %>% 
